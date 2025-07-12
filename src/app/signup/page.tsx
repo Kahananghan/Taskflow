@@ -1,0 +1,71 @@
+'use client'
+import axios from 'axios'
+import { useRouter } from 'next/navigation'
+import { useState } from 'react'
+
+export default function SignUp() {
+  const [name, setName] = useState('')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const router = useRouter()
+
+  return (
+    <div className="min-h-screen flex items-center justify-center bg-gray-50">
+      <div className="max-w-md w-full space-y-8 p-8 bg-white rounded-lg shadow">
+        <h2 className="text-2xl font-bold text-center">Sign Up</h2>
+        <form className="space-y-6" onSubmit={async (e) => {
+          e.preventDefault()
+          try {
+            await axios.post('/api/user/signup', { name, email, password })
+            router.push('/signin')
+          } catch (error) {
+            console.error('Signup failed:', error)
+          }
+        }}>
+          <div>
+            <input
+              type="text"
+              placeholder="Full Name"
+              value={name}
+              onChange={(e) => setName(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <input
+              type="email"
+              placeholder="Email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <div>
+            <input
+              type="password"
+              placeholder="Password"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+              className="w-full px-3 py-2 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-500"
+              required
+            />
+          </div>
+          <button
+            type="submit"
+            className="w-full bg-blue-600 text-white py-2 px-4 rounded-md hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500"
+          >
+            Sign Up
+          </button>
+        </form>
+        <p className="text-center text-sm text-gray-600">
+          Already have an account?{' '}
+          <a href="/signin" className="text-blue-600 hover:text-blue-500">
+            Sign in
+          </a>
+        </p>
+      </div>
+    </div>
+  )
+}
