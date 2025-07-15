@@ -18,7 +18,7 @@ export default function SignIn() {
         <form className="space-y-6" onSubmit={async (e) => {
           e.preventDefault()
           try {
-            await axios.post('/api/user/signin', { email, password })
+            await axios.post('/auth/signin', { email, password })
             router.push('/')
           } catch (error) {
             console.error('Signin failed:', error)
