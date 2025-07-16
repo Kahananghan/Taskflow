@@ -3,6 +3,17 @@ import { PrismaClient } from "@prisma/client";
 
 const prismaClient = new PrismaClient()
 
+// Validation middleware function
+function validateSigninData(data: any) {
+    if (!data.email || !data.password) {
+        return { valid: false, error: "Email and password required" }
+    }
+    if (!data.email.includes('@')) {
+        return { valid: false, error: "Invalid email format" }
+    }
+    return { valid: true }
+}
+
 export async function GET() {
     try {
         const users = await prismaClient.user.findMany({
@@ -23,6 +34,12 @@ export async function GET() {
 export async function POST(req: NextRequest){
     try {
         const data = await req.json()
+        
+        // Apply validation middleware
+        const validation = validateSigninData(data)
+        if (!validation.valid) {
+            return NextResponse.json({ error: validation.error }, { status: 400 })
+        }
 
         const user = await prismaClient.user.findUnique({
             where: {

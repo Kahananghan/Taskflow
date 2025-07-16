@@ -3,6 +3,17 @@ import { PrismaClient } from "@prisma/client";
 
 const prismaClient = new PrismaClient()
 
+// Validation middleware function
+function validateSignupData(data: any) {
+    if (!data.email || !data.name || !data.password) {
+        return { valid: false, error: "Missing required fields" }
+    }
+    if (data.password.length < 6) {
+        return { valid: false, error: "Password must be at least 6 characters" }
+    }
+    return { valid: true }
+}
+
 export async function GET() {
     try {
         const users = await prismaClient.user.findMany({
@@ -23,6 +34,12 @@ export async function GET() {
 export async function POST(req: NextRequest){
     try {
         const data = await req.json()
+        
+        // Apply validation middleware
+        const validation = validateSignupData(data)
+        if (!validation.valid) {
+            return NextResponse.json({ error: validation.error }, { status: 400 })
+        }
 
         const user = await prismaClient.user.create({
             data: {
