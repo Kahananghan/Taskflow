@@ -11,8 +11,11 @@
   "dependencies": {
     "@prisma/client": "^6.11.1",
     "@prisma/extension-accelerate": "^2.0.2",
+    "@types/jsonwebtoken": "^9.0.10",
     "axios": "^1.10.0",
+    "jsonwebtoken": "^9.0.2",
     "next": "15.3.5",
+    "next-auth": "^4.24.11",
     "prisma": "^6.11.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
