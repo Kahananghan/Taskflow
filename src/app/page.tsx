@@ -11,6 +11,7 @@ import axios from "axios";
 //   .then(response => setdata(response.data))
 //   }, [])
 
+
 export default async function User(){
   const response = await axios.get('https://fakestoreapi.com/products')
   await new Promise(r => setTimeout(r,1000))
