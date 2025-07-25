@@ -18,12 +18,20 @@ export const authOptions = {
                     return null;
                 }
 
-                if (credentials.email === "test@example.com" && credentials.password === "password") {
-                    return {
-                        id: "1",
-                        email: credentials.email,
-                        name: "Test User",
-                    };
+                try {
+                    const user = await prisma.user.findUnique({
+                        where: { email: credentials.email }
+                    });
+
+                    if (user && user.password === credentials.password) {
+                        return {
+                            id: user.id.toString(),
+                            email: user.email,
+                            name: user.name,
+                        };
+                    }
+                } catch (error) {
+                    console.error('Auth error:', error);
                 }
 
                 return null;
@@ -37,26 +45,10 @@ export const authOptions = {
     ],
     callbacks: {
         async signIn({ user, account, profile }) {
-            if (account?.provider === 'google') {
-                try {
-                    const existingUser = await prisma.user.findUnique({
-                        where: { email: user.email! }
-                    });
-
-                    if (!existingUser) {
-                        await prisma.user.create({
-                            data: {
-                                email: user.email!,
-                                name: user.name || null,
-                            }
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error saving user:', error);
-                    return false;
-                }
-            }
             return true;
+        },
+        async redirect({ url, baseUrl }) {
+            return '/dashboard';
         },
         async session({ session, token }) {
             return session;
@@ -65,9 +57,8 @@ export const authOptions = {
             return token;
         }
     },
-    pages: {
-        signIn: '/signin',
-    },
+
+
     session: {
         strategy: "jwt",
     },
