@@ -112,8 +112,11 @@ export default function Dashboard() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-purple-900 via-blue-900 to-indigo-900">
-        <div className="spinner"></div>
+      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+        <div className="flex flex-col items-center space-y-4">
+          <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+          <p className="text-gray-600 font-medium">Loading...</p>
+        </div>
       </div>
     );
   }
@@ -168,32 +171,45 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
       {/* Header */}
-      <div className="bg-white/80 backdrop-blur-sm border-b border-gray-200 sticky top-0 z-40">
-        <div className="max-w-7xl mx-auto px-4 py-4">
-          <div className="flex justify-between items-center">
+      <div className="bg-white/90 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
+          <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 gap-4">
             <div className="flex items-center space-x-4">
-              <h1 className="text-3xl font-bold gradient-text">TaskFlow Pro</h1>
-              <div className="hidden md:flex items-center space-x-2 text-sm text-gray-600">
+              <div className="flex items-center space-x-3">
+                <div className="w-8 h-8 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center">
+                  <span className="text-white font-bold text-sm">T</span>
+                </div>
+                <h1 className="text-2xl sm:text-3xl font-bold bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                  TaskFlow Pro
+                </h1>
+              </div>
+              <div className="hidden lg:flex items-center space-x-2 text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
+                <span>👋</span>
                 <span>Welcome back,</span>
-                <span className="font-medium">{session.user?.name || session.user?.email}</span>
+                <span className="font-medium text-gray-800">{session.user?.name?.split(' ')[0] || 'User'}</span>
               </div>
             </div>
-            <div className="flex items-center space-x-4">
+            
+            <div className="flex items-center space-x-3 w-full sm:w-auto">
               {/* Search */}
-              <div className="relative">
+              <div className="relative flex-1 sm:flex-none">
                 <input
                   type="text"
                   placeholder="Search tasks..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="pl-10 pr-4 py-2 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 w-64"
+                  className="w-full sm:w-64 pl-10 pr-4 py-2.5 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all placeholder-gray-400"
                 />
-                <div className="absolute left-3 top-2.5 text-gray-400">🔍</div>
+                <div className="absolute left-3 top-3 text-gray-400">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                  </svg>
+                </div>
               </div>
               
               {/* Profile */}
-              <div className="flex items-center space-x-3">
-                <div className="w-10 h-10 rounded-full border-2 border-white shadow-sm bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold">
+              <div className="flex items-center space-x-2">
+                <div className="w-10 h-10 rounded-full border-2 border-white shadow-lg bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-semibold hover:scale-105 transition-transform">
                   {session.user?.image ? (
                     <img
                       src={session.user.image}
@@ -208,9 +224,12 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={() => signOut()}
-                  className="text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100"
+                  className="hidden sm:flex items-center space-x-1 text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 text-sm font-medium"
                 >
-                  Sign Out
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+                  </svg>
+                  <span>Sign Out</span>
                 </button>
               </div>
             </div>
@@ -220,108 +239,112 @@ export default function Dashboard() {
 
       <div className="max-w-7xl mx-auto px-4 py-8">
         {/* Enhanced Stats Cards */}
-        <div className="grid grid-cols-2 md:grid-cols-5 gap-4 mb-8">
-          <div className="glass p-6 rounded-xl hover-lift animate-fadeInUp">
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold text-blue-600 mb-1">{stats.total}</div>
-                <div className="text-sm text-gray-600">Total Tasks</div>
+        <div className="grid grid-cols-2 lg:grid-cols-5 gap-3 sm:gap-4 mb-6 sm:mb-8">
+          {[
+            { label: 'Total', value: stats.total, color: 'blue', icon: '📊', bg: 'from-blue-500 to-blue-600' },
+            { label: 'Completed', value: stats.completed, color: 'green', icon: '✅', bg: 'from-green-500 to-green-600' },
+            { label: 'Pending', value: stats.pending, color: 'orange', icon: '⏳', bg: 'from-orange-500 to-orange-600' },
+            { label: 'Urgent', value: stats.urgent, color: 'red', icon: '🚨', bg: 'from-red-500 to-red-600' },
+            { label: 'Overdue', value: stats.overdue, color: 'purple', icon: '⚠️', bg: 'from-purple-500 to-purple-600' }
+          ].map((stat, index) => (
+            <div
+              key={stat.label}
+              className="bg-white/70 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300 border border-gray-100/50"
+              style={{animationDelay: `${index * 0.1}s`}}
+            >
+              <div className="flex items-center justify-between">
+                <div>
+                  <div className={`text-xl sm:text-2xl font-bold text-${stat.color}-600 mb-1`}>
+                    {stat.value}
+                  </div>
+                  <div className="text-xs sm:text-sm text-gray-600 font-medium">
+                    {stat.label}
+                  </div>
+                </div>
+                <div className={`w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-br ${stat.bg} flex items-center justify-center text-white text-lg sm:text-xl shadow-lg`}>
+                  {stat.icon}
+                </div>
               </div>
-              <div className="text-3xl">📋</div>
             </div>
-          </div>
-          <div className="glass p-6 rounded-xl hover-lift animate-fadeInUp" style={{animationDelay: '0.1s'}}>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold text-green-600 mb-1">{stats.completed}</div>
-                <div className="text-sm text-gray-600">Completed</div>
-              </div>
-              <div className="text-3xl">✅</div>
-            </div>
-          </div>
-          <div className="glass p-6 rounded-xl hover-lift animate-fadeInUp" style={{animationDelay: '0.2s'}}>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold text-orange-600 mb-1">{stats.pending}</div>
-                <div className="text-sm text-gray-600">Pending</div>
-              </div>
-              <div className="text-3xl">⏳</div>
-            </div>
-          </div>
-          <div className="glass p-6 rounded-xl hover-lift animate-fadeInUp" style={{animationDelay: '0.3s'}}>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold text-red-600 mb-1">{stats.urgent}</div>
-                <div className="text-sm text-gray-600">Urgent</div>
-              </div>
-              <div className="text-3xl">🚨</div>
-            </div>
-          </div>
-          <div className="glass p-6 rounded-xl hover-lift animate-fadeInUp" style={{animationDelay: '0.4s'}}>
-            <div className="flex items-center justify-between">
-              <div>
-                <div className="text-2xl font-bold text-purple-600 mb-1">{stats.overdue}</div>
-                <div className="text-sm text-gray-600">Overdue</div>
-              </div>
-              <div className="text-3xl">⚠️</div>
-            </div>
-          </div>
+          ))}
         </div>
 
         {/* Enhanced Controls */}
-        <div className="glass p-6 rounded-2xl mb-8">
-          <div className="flex flex-col lg:flex-row justify-between items-start lg:items-center gap-4">
-            <div className="flex flex-wrap gap-3">
+        <div className="bg-white/70 backdrop-blur-sm p-4 sm:p-6 rounded-2xl mb-6 sm:mb-8 shadow-sm border border-gray-100/50">
+          <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:justify-between lg:items-center">
+            <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               {/* Filter Buttons */}
-              <div className="flex gap-2">
-                {['all', 'pending', 'completed'].map((f) => (
+              <div className="flex gap-2 overflow-x-auto pb-2 sm:pb-0">
+                {[
+                  { key: 'all', label: 'All Tasks', icon: '📋' },
+                  { key: 'pending', label: 'Pending', icon: '⏳' },
+                  { key: 'completed', label: 'Completed', icon: '✅' }
+                ].map((f) => (
                   <button
-                    key={f}
-                    onClick={() => setFilter(f)}
-                    className={`px-4 py-2 rounded-lg font-medium transition-all ${
-                      filter === f
-                        ? 'btn-gradient text-white shadow-lg'
-                        : 'bg-white/70 text-gray-700 hover:bg-white hover:shadow-md'
+                    key={f.key}
+                    onClick={() => setFilter(f.key)}
+                    className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium transition-all whitespace-nowrap ${
+                      filter === f.key
+                        ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg scale-105'
+                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 hover:shadow-sm'
                     }`}
                   >
-                    {f.charAt(0).toUpperCase() + f.slice(1)}
+                    <span className="text-sm">{f.icon}</span>
+                    <span className="text-sm font-medium">{f.label}</span>
                   </button>
                 ))}
               </div>
               
-              {/* Sort Dropdown */}
-              <select
-                value={sortBy}
-                onChange={(e) => setSortBy(e.target.value)}
-                className="px-4 py-2 border border-gray-200 rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-              >
-                <option value="created">Sort by Created</option>
-                <option value="priority">Sort by Priority</option>
-                <option value="dueDate">Sort by Due Date</option>
-              </select>
-              
-              {/* View Mode Toggle */}
-              <div className="flex border border-gray-200 rounded-lg overflow-hidden">
-                <button
-                  onClick={() => setViewMode('grid')}
-                  className={`px-3 py-2 ${viewMode === 'grid' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'}`}
+              {/* Sort & View Controls */}
+              <div className="flex gap-2">
+                <select
+                  value={sortBy}
+                  onChange={(e) => setSortBy(e.target.value)}
+                  className="px-3 py-2.5 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium text-gray-700"
                 >
-                  📊
-                </button>
-                <button
-                  onClick={() => setViewMode('list')}
-                  className={`px-3 py-2 ${viewMode === 'list' ? 'bg-blue-500 text-white' : 'bg-white text-gray-700'}`}
-                >
-                  📋
-                </button>
+                  <option value="created">📅 Recent</option>
+                  <option value="priority">🎯 Priority</option>
+                  <option value="dueDate">⏰ Due Date</option>
+                </select>
+                
+                <div className="flex bg-gray-50 rounded-xl overflow-hidden">
+                  <button
+                    onClick={() => setViewMode('grid')}
+                    className={`px-3 py-2.5 transition-all ${
+                      viewMode === 'grid' 
+                        ? 'bg-blue-500 text-white shadow-sm' 
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                    title="Grid View"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path d="M5 3a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V5a2 2 0 00-2-2H5zM5 11a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2v-2a2 2 0 00-2-2H5zM11 5a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2V5zM11 13a2 2 0 012-2h2a2 2 0 012 2v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-2z" />
+                    </svg>
+                  </button>
+                  <button
+                    onClick={() => setViewMode('list')}
+                    className={`px-3 py-2.5 transition-all ${
+                      viewMode === 'list' 
+                        ? 'bg-blue-500 text-white shadow-sm' 
+                        : 'text-gray-600 hover:text-gray-800'
+                    }`}
+                    title="List View"
+                  >
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M3 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1zm0 4a1 1 0 011-1h12a1 1 0 110 2H4a1 1 0 01-1-1z" clipRule="evenodd" />
+                    </svg>
+                  </button>
+                </div>
               </div>
             </div>
             
             <button
               onClick={() => setShowForm(!showForm)}
-              className="btn-gradient text-white px-6 py-3 rounded-xl font-medium shadow-lg flex items-center space-x-2 hover-lift"
+              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center space-x-2 w-full sm:w-auto justify-center"
             >
-              <span>+</span>
+              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
               <span>Add Task</span>
             </button>
           </div>
