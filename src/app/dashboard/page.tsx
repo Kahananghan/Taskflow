@@ -30,6 +30,11 @@ export default function Dashboard() {
     priority: 'MEDIUM' as const,
     dueDate: ''
   });
+  const [showAI, setShowAI] = useState(false);
+  const [aiResponse, setAiResponse] = useState('');
+  const [aiLoading, setAiLoading] = useState(false);
+  const [chatMessage, setChatMessage] = useState('');
+  const [activeAIFunction, setActiveAIFunction] = useState<'suggestions' | 'analyze' | 'chat' | null>(null);
 
   useEffect(() => {
     if (status === 'unauthenticated') {
@@ -107,6 +112,50 @@ export default function Dashboard() {
       }
     } catch (error) {
       console.error('Failed to delete task:', error);
+    }
+  };
+
+  const getAISuggestions = async () => {
+    setActiveAIFunction('suggestions');
+    setAiLoading(true);
+    setAiResponse(''); // Clear previous response
+    try {
+      const response = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'suggestions', tasks }),
+      });
+      const data = await response.json();
+      console.log('AI Suggestions Response:', data); // Debug log
+      setAiResponse(data.response || 'No suggestions available');
+    } catch (error) {
+      console.error('AI Error:', error);
+      setAiResponse('AI suggestions unavailable. Please try again.');
+    } finally {
+      setAiLoading(false);
+    }
+  };
+
+  const chatWithAI = async () => {
+    if (!chatMessage.trim()) return;
+    setActiveAIFunction('chat');
+    setAiLoading(true);
+    setAiResponse(''); // Clear previous response
+    try {
+      const response = await fetch('/api/ai', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ type: 'chat', message: chatMessage, tasks }),
+      });
+      const data = await response.json();
+      console.log('AI Chat Response:', data); // Debug log
+      setAiResponse(data.response || 'No response available');
+      setChatMessage('');
+    } catch (error) {
+      console.error('AI Chat Error:', error);
+      setAiResponse('AI chat unavailable. Please try again.');
+    } finally {
+      setAiLoading(false);
     }
   };
 
@@ -338,17 +387,123 @@ export default function Dashboard() {
               </div>
             </div>
             
-            <button
-              onClick={() => setShowForm(!showForm)}
-              className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center space-x-2 w-full sm:w-auto justify-center"
-            >
-              <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
-              </svg>
-              <span>Add Task</span>
-            </button>
+            <div className="flex gap-3 w-full sm:w-auto">
+              <button
+                onClick={() => setShowAI(!showAI)}
+                className="bg-gradient-to-r from-purple-500 to-pink-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center space-x-2 flex-1 sm:flex-none justify-center"
+              >
+                <span>🤖</span>
+                <span>AI Assistant</span>
+              </button>
+              <button
+                onClick={() => setShowForm(!showForm)}
+                className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 flex items-center space-x-2 flex-1 sm:flex-none justify-center"
+              >
+                <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+                </svg>
+                <span>Add Task</span>
+              </button>
+            </div>
           </div>
         </div>
+
+        {/* AI Assistant */}
+        {showAI && (
+          <div className="glass p-8 rounded-2xl shadow-xl mb-8 animate-fadeInScale">
+            <div className="flex items-center justify-between mb-6">
+              <h2 className="text-2xl font-semibold text-gray-800">🤖 AI Task Assistant</h2>
+              <button
+                onClick={() => setShowAI(false)}
+                className="text-gray-500 hover:text-gray-700 text-2xl"
+              >
+                ×
+              </button>
+            </div>
+            
+            <div className="space-y-6">
+              <div className="text-sm text-gray-600 mb-4">
+                📊 Current Tasks: {tasks.length} | Completed: {tasks.filter(t => t.completed).length} | Pending: {tasks.filter(t => !t.completed).length}
+              </div>
+              <div className="flex gap-3 flex-wrap">
+                <button
+                  onClick={getAISuggestions}
+                  disabled={aiLoading}
+                  className="bg-gradient-to-r from-blue-500 to-purple-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50"
+                >
+                  {aiLoading ? '🔄 Analyzing...' : '💡 Get Smart Suggestions'}
+                </button>
+                <button
+                  onClick={async () => {
+                    console.log('Analyze button clicked, tasks:', tasks);
+                    setActiveAIFunction('analyze');
+                    setAiLoading(true);
+                    setAiResponse('');
+                    try {
+                      const response = await fetch('/api/ai', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ type: 'analyze', tasks }),
+                      });
+                      const data = await response.json();
+                      console.log('AI Analysis Response:', data);
+                      setAiResponse(data.response || 'No analysis available');
+                    } catch (error) {
+                      console.error('AI Analysis Error:', error);
+                      setAiResponse('Analysis unavailable. Please try again.');
+                    } finally {
+                      setAiLoading(false);
+                    }
+                  }}
+                  disabled={aiLoading}
+                  className="bg-gradient-to-r from-green-500 to-teal-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50"
+                >
+                  {aiLoading ? '🔄 Analyzing...' : '📊 Analyze Tasks'}
+                </button>
+              </div>
+              
+              <div className="flex gap-3">
+                <input
+                  type="text"
+                  value={chatMessage}
+                  onChange={(e) => setChatMessage(e.target.value)}
+                  onKeyPress={(e) => e.key === 'Enter' && chatWithAI()}
+                  placeholder="Ask me anything about your tasks..."
+                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                />
+                <button
+                  onClick={chatWithAI}
+                  disabled={aiLoading || !chatMessage.trim()}
+                  className="bg-gradient-to-r from-green-500 to-blue-600 text-white px-6 py-3 rounded-xl font-medium shadow-lg hover:shadow-xl hover:scale-105 transition-all duration-300 disabled:opacity-50"
+                >
+                  💬 Chat
+                </button>
+              </div>
+              
+              {(aiResponse || aiLoading) && (
+                <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl border border-gray-200 shadow-sm">
+                  <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
+                    <span className="mr-2">🤖</span>
+                    {activeAIFunction === 'suggestions' && 'Smart Suggestions:'}
+                    {activeAIFunction === 'analyze' && 'Task Analysis:'}
+                    {activeAIFunction === 'chat' && 'AI Response:'}
+                    {!activeAIFunction && 'AI Response:'}
+                  </h3>
+                  {aiLoading ? (
+                    <div className="flex items-center space-x-3 text-gray-600">
+                      <div className="w-5 h-5 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
+                      <span>Analyzing your tasks...</span>
+                    </div>
+                  ) : (
+                    <div className="text-gray-700 whitespace-pre-line leading-relaxed">
+                      {aiResponse || 'No response received'}
+                    </div>
+                  )}
+                </div>
+              )}
+            </div>
+          </div>
+        )}
 
         {/* Enhanced Task Form */}
         {showForm && (
