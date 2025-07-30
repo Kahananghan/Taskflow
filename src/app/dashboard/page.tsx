@@ -3,6 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useSession, signOut } from 'next-auth/react';
 import { useRouter } from 'next/navigation';
+import { useTheme } from '../contexts/ThemeContext';
 
 interface Task {
   id: number;
@@ -17,6 +18,7 @@ interface Task {
 export default function Dashboard() {
   const { data: session, status } = useSession();
   const router = useRouter();
+  const { theme, toggleTheme } = useTheme();
   const [tasks, setTasks] = useState<Task[]>([]);
   const [loading, setLoading] = useState(true);
   const [showForm, setShowForm] = useState(false);
@@ -161,10 +163,10 @@ export default function Dashboard() {
 
   if (status === 'loading' || loading) {
     return (
-      <div className="flex justify-center items-center min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+      <div className="flex justify-center items-center min-h-screen">
         <div className="flex flex-col items-center space-y-4">
           <div className="w-12 h-12 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
-          <p className="text-gray-600 font-medium">Loading...</p>
+          <p className="text-gray-600 dark:text-gray-300 font-medium">Loading...</p>
         </div>
       </div>
     );
@@ -218,9 +220,9 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50">
+    <div className="min-h-screen transition-colors duration-300">
       {/* Header */}
-      <div className="bg-white/90 backdrop-blur-md border-b border-gray-200/50 sticky top-0 z-50 shadow-sm">
+      <div className="bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border-b border-gray-200/50 dark:border-gray-700/50 sticky top-0 z-50 shadow-sm transition-colors duration-300">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex flex-col sm:flex-row justify-between items-start sm:items-center py-4 gap-4">
             <div className="flex items-center space-x-4">
@@ -232,10 +234,10 @@ export default function Dashboard() {
                   TaskFlow Pro
                 </h1>
               </div>
-              <div className="hidden lg:flex items-center space-x-2 text-sm text-gray-600 bg-gray-50 px-3 py-1 rounded-full">
+              <div className="hidden lg:flex items-center space-x-2 text-sm text-gray-600 dark:text-gray-300 bg-gray-50 dark:bg-gray-800 px-3 py-1 rounded-full">
                 <span>👋</span>
                 <span>Welcome back,</span>
-                <span className="font-medium text-gray-800">{session.user?.name?.split(' ')[0] || 'User'}</span>
+                <span className="font-medium text-gray-800 dark:text-gray-200">{session.user?.name?.split(' ')[0] || 'User'}</span>
               </div>
             </div>
             
@@ -247,14 +249,31 @@ export default function Dashboard() {
                   placeholder="Search tasks..."
                   value={searchTerm}
                   onChange={(e) => setSearchTerm(e.target.value)}
-                  className="w-full sm:w-64 pl-10 pr-4 py-2.5 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all placeholder-gray-400"
+                  className="w-full sm:w-64 pl-10 pr-4 py-2.5 bg-gray-50 dark:bg-gray-800 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white dark:focus:bg-gray-700 transition-all placeholder-gray-400 dark:placeholder-gray-500 text-gray-900 dark:text-gray-100"
                 />
-                <div className="absolute left-3 top-3 text-gray-400">
+                <div className="absolute left-3 top-3 text-gray-400 dark:text-gray-500">
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
               </div>
+              
+              {/* Theme Toggle */}
+              <button
+                onClick={toggleTheme}
+                className="p-2.5 rounded-xl bg-gray-50 dark:bg-gray-800 hover:bg-gray-100 dark:hover:bg-gray-700 transition-all duration-300 text-gray-600 dark:text-gray-300"
+                title={`Switch to ${theme === 'light' ? 'dark' : 'light'} mode`}
+              >
+                {theme === 'light' ? (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z" />
+                  </svg>
+                ) : (
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                )}
+              </button>
               
               {/* Profile */}
               <div className="flex items-center space-x-2">
@@ -273,7 +292,7 @@ export default function Dashboard() {
                 </div>
                 <button
                   onClick={() => signOut()}
-                  className="hidden sm:flex items-center space-x-1 text-gray-600 hover:text-gray-900 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 text-sm font-medium"
+                  className="hidden sm:flex items-center space-x-1 text-gray-600 dark:text-gray-300 hover:text-gray-900 dark:hover:text-gray-100 transition-colors px-3 py-2 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-800 text-sm font-medium"
                 >
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
@@ -298,7 +317,7 @@ export default function Dashboard() {
           ].map((stat, index) => (
             <div
               key={stat.label}
-              className="bg-white/70 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300 border border-gray-100/50"
+              className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-4 sm:p-6 rounded-2xl shadow-sm hover:shadow-md hover:scale-105 transition-all duration-300 border border-gray-100/50 dark:border-gray-700/50"
               style={{animationDelay: `${index * 0.1}s`}}
             >
               <div className="flex items-center justify-between">
@@ -306,7 +325,7 @@ export default function Dashboard() {
                   <div className={`text-xl sm:text-2xl font-bold text-${stat.color}-600 mb-1`}>
                     {stat.value}
                   </div>
-                  <div className="text-xs sm:text-sm text-gray-600 font-medium">
+                  <div className="text-xs sm:text-sm text-gray-600 dark:text-gray-300 font-medium">
                     {stat.label}
                   </div>
                 </div>
@@ -319,7 +338,7 @@ export default function Dashboard() {
         </div>
 
         {/* Enhanced Controls */}
-        <div className="bg-white/70 backdrop-blur-sm p-4 sm:p-6 rounded-2xl mb-6 sm:mb-8 shadow-sm border border-gray-100/50">
+        <div className="bg-white/70 dark:bg-gray-800/70 backdrop-blur-sm p-4 sm:p-6 rounded-2xl mb-6 sm:mb-8 shadow-sm border border-gray-100/50 dark:border-gray-700/50 transition-colors duration-300">
           <div className="flex flex-col space-y-4 lg:space-y-0 lg:flex-row lg:justify-between lg:items-center">
             <div className="flex flex-col sm:flex-row gap-3 sm:gap-4">
               {/* Filter Buttons */}
@@ -335,7 +354,7 @@ export default function Dashboard() {
                     className={`flex items-center space-x-2 px-4 py-2.5 rounded-xl font-medium transition-all whitespace-nowrap ${
                       filter === f.key
                         ? 'bg-gradient-to-r from-blue-500 to-purple-600 text-white shadow-lg scale-105'
-                        : 'bg-gray-50 text-gray-700 hover:bg-gray-100 hover:shadow-sm'
+                        : 'bg-gray-50 dark:bg-gray-700 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 hover:shadow-sm'
                     }`}
                   >
                     <span className="text-sm">{f.icon}</span>
@@ -349,20 +368,20 @@ export default function Dashboard() {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value)}
-                  className="px-3 py-2.5 bg-gray-50 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium text-gray-700"
+                  className="px-3 py-2.5 bg-gray-50 dark:bg-gray-700 border-0 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm font-medium text-gray-700 dark:text-gray-300 transition-colors duration-300"
                 >
                   <option value="created">📅 Recent</option>
                   <option value="priority">🎯 Priority</option>
                   <option value="dueDate">⏰ Due Date</option>
                 </select>
                 
-                <div className="flex bg-gray-50 rounded-xl overflow-hidden">
+                <div className="flex bg-gray-50 dark:bg-gray-700 rounded-xl overflow-hidden transition-colors duration-300">
                   <button
                     onClick={() => setViewMode('grid')}
                     className={`px-3 py-2.5 transition-all ${
                       viewMode === 'grid' 
                         ? 'bg-blue-500 text-white shadow-sm' 
-                        : 'text-gray-600 hover:text-gray-800'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
                     }`}
                     title="Grid View"
                   >
@@ -375,7 +394,7 @@ export default function Dashboard() {
                     className={`px-3 py-2.5 transition-all ${
                       viewMode === 'list' 
                         ? 'bg-blue-500 text-white shadow-sm' 
-                        : 'text-gray-600 hover:text-gray-800'
+                        : 'text-gray-600 dark:text-gray-400 hover:text-gray-800 dark:hover:text-gray-200'
                     }`}
                     title="List View"
                   >
@@ -412,17 +431,17 @@ export default function Dashboard() {
         {showAI && (
           <div className="glass p-8 rounded-2xl shadow-xl mb-8 animate-fadeInScale">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">🤖 AI Task Assistant</h2>
+              <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">🤖 AI Task Assistant</h2>
               <button
                 onClick={() => setShowAI(false)}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl transition-colors duration-300"
               >
                 ×
               </button>
             </div>
             
             <div className="space-y-6">
-              <div className="text-sm text-gray-600 mb-4">
+              <div className="text-sm text-gray-600 dark:text-gray-300 mb-4">
                 📊 Current Tasks: {tasks.length} | Completed: {tasks.filter(t => t.completed).length} | Pending: {tasks.filter(t => !t.completed).length}
               </div>
               <div className="flex gap-3 flex-wrap">
@@ -469,7 +488,7 @@ export default function Dashboard() {
                   onChange={(e) => setChatMessage(e.target.value)}
                   onKeyPress={(e) => e.key === 'Enter' && chatWithAI()}
                   placeholder="Ask me anything about your tasks..."
-                  className="flex-1 px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="flex-1 px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
                 <button
                   onClick={chatWithAI}
@@ -481,8 +500,8 @@ export default function Dashboard() {
               </div>
               
               {(aiResponse || aiLoading) && (
-                <div className="bg-white/80 backdrop-blur-sm p-6 rounded-xl border border-gray-200 shadow-sm">
-                  <h3 className="font-semibold text-gray-800 mb-3 flex items-center">
+                <div className="bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm p-6 rounded-xl border border-gray-200 dark:border-gray-600 shadow-sm transition-colors duration-300">
+                  <h3 className="font-semibold text-gray-800 dark:text-gray-200 mb-3 flex items-center">
                     <span className="mr-2">🤖</span>
                     {activeAIFunction === 'suggestions' && 'Smart Suggestions:'}
                     {activeAIFunction === 'analyze' && 'Task Analysis:'}
@@ -490,12 +509,12 @@ export default function Dashboard() {
                     {!activeAIFunction && 'AI Response:'}
                   </h3>
                   {aiLoading ? (
-                    <div className="flex items-center space-x-3 text-gray-600">
+                    <div className="flex items-center space-x-3 text-gray-600 dark:text-gray-300">
                       <div className="w-5 h-5 border-2 border-blue-200 border-t-blue-600 rounded-full animate-spin"></div>
                       <span>Analyzing your tasks...</span>
                     </div>
                   ) : (
-                    <div className="text-gray-700 whitespace-pre-line leading-relaxed">
+                    <div className="text-gray-700 dark:text-gray-300 whitespace-pre-line leading-relaxed">
                       {aiResponse || 'No response received'}
                     </div>
                   )}
@@ -509,10 +528,10 @@ export default function Dashboard() {
         {showForm && (
           <div className="glass p-8 rounded-2xl shadow-xl mb-8 animate-fadeInScale">
             <div className="flex items-center justify-between mb-6">
-              <h2 className="text-2xl font-semibold text-gray-800">✨ Create New Task</h2>
+              <h2 className="text-2xl font-semibold text-gray-800 dark:text-gray-200">✨ Create New Task</h2>
               <button
                 onClick={() => setShowForm(false)}
-                className="text-gray-500 hover:text-gray-700 text-2xl"
+                className="text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 text-2xl transition-colors duration-300"
               >
                 ×
               </button>
@@ -520,7 +539,7 @@ export default function Dashboard() {
             <form onSubmit={createTask} className="space-y-6">
               <div className="grid md:grid-cols-2 gap-6">
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     📝 Task Title
                   </label>
                   <input
@@ -528,19 +547,19 @@ export default function Dashboard() {
                     required
                     value={newTask.title}
                     onChange={(e) => setNewTask({ ...newTask, title: e.target.value })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                     placeholder="What needs to be done?"
                   />
                 </div>
                 
                 <div>
-                  <label className="block text-sm font-medium text-gray-700 mb-2">
+                  <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                     🎯 Priority Level
                   </label>
                   <select
                     value={newTask.priority}
                     onChange={(e) => setNewTask({ ...newTask, priority: e.target.value as any })}
-                    className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                    className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   >
                     <option value="LOW">🟢 Low Priority</option>
                     <option value="MEDIUM">🟡 Medium Priority</option>
@@ -551,27 +570,27 @@ export default function Dashboard() {
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   📄 Description
                 </label>
                 <textarea
                   value={newTask.description}
                   onChange={(e) => setNewTask({ ...newTask, description: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                   rows={3}
                   placeholder="Add more details about this task..."
                 />
               </div>
               
               <div>
-                <label className="block text-sm font-medium text-gray-700 mb-2">
+                <label className="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-2">
                   📅 Due Date
                 </label>
                 <input
                   type="date"
                   value={newTask.dueDate}
                   onChange={(e) => setNewTask({ ...newTask, dueDate: e.target.value })}
-                  className="w-full px-4 py-3 border border-gray-200 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                  className="w-full px-4 py-3 border border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 rounded-xl focus:outline-none focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 />
               </div>
               
@@ -585,7 +604,7 @@ export default function Dashboard() {
                 <button
                   type="button"
                   onClick={() => setShowForm(false)}
-                  className="bg-gray-200 text-gray-700 px-6 py-3 rounded-xl hover:bg-gray-300 transition-all font-medium"
+                  className="bg-gray-200 dark:bg-gray-700 text-gray-700 dark:text-gray-300 px-6 py-3 rounded-xl hover:bg-gray-300 dark:hover:bg-gray-600 transition-all font-medium"
                 >
                   Cancel
                 </button>
@@ -599,10 +618,10 @@ export default function Dashboard() {
           {filteredTasks.length === 0 ? (
             <div className="col-span-full text-center py-16 glass rounded-2xl">
               <div className="text-8xl mb-6">📝</div>
-              <h3 className="text-2xl font-semibold text-gray-700 mb-2">
+              <h3 className="text-2xl font-semibold text-gray-700 dark:text-gray-300 mb-2">
                 {filter === 'all' ? 'No tasks yet' : `No ${filter} tasks`}
               </h3>
-              <p className="text-gray-500 mb-6">
+              <p className="text-gray-500 dark:text-gray-400 mb-6">
                 {filter === 'all' 
                   ? 'Start by creating your first task to get organized!' 
                   : `You don't have any ${filter} tasks at the moment.`
@@ -642,15 +661,15 @@ export default function Dashboard() {
                     <div className="flex-1">
                       <h3 className={`text-lg font-semibold mb-2 transition-all ${
                         task.completed 
-                          ? 'line-through text-gray-500' 
-                          : 'text-gray-800'
+                          ? 'line-through text-gray-600 dark:text-gray-400' 
+                          : 'text-gray-800 dark:text-gray-200'
                       }`}>
                         {task.title}
                       </h3>
                       
                       {task.description && (
                         <p className={`mb-3 text-sm transition-all ${
-                          task.completed ? 'text-gray-400' : 'text-gray-600'
+                          task.completed ? 'text-gray-400 dark:text-gray-500' : 'text-gray-600 dark:text-gray-300'
                         }`}>
                           {task.description}
                         </p>
@@ -660,14 +679,14 @@ export default function Dashboard() {
                   
                   <button
                     onClick={() => deleteTask(task.id)}
-                    className="text-red-500 hover:text-red-700 hover:bg-red-50 p-2 rounded-lg transition-all"
+                    className="text-red-500 hover:text-red-700 hover:bg-red-50 dark:hover:bg-red-900/20 p-2 rounded-lg transition-all"
                     title="Delete task"
                   >
                     🗑️
                   </button>
                 </div>
                 
-                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100">
+                <div className="flex flex-wrap items-center gap-2 pt-3 border-t border-gray-100 dark:border-gray-700">
                   <span className={`px-3 py-1 text-xs font-medium rounded-full border ${getPriorityColor(task.priority)}`}>
                     {task.priority}
                   </span>
@@ -682,7 +701,7 @@ export default function Dashboard() {
                     </span>
                   )}
                   
-                  <span className="text-xs text-gray-400 ml-auto">
+                  <span className="text-xs text-gray-400 dark:text-gray-500 ml-auto">
                     {new Date(task.createdAt).toLocaleDateString()}
                   </span>
                 </div>

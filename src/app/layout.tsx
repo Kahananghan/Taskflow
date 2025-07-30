@@ -1,6 +1,7 @@
 import './globals.css'
 import Link from 'next/link'
 import { Providers } from './providers'
+import { ThemeProvider } from './contexts/ThemeContext'
 
 export default function RootLayout({
   children,
@@ -10,9 +11,11 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body suppressHydrationWarning={true}>
-        <Providers>
-          {children}
-        </Providers>
+        <ThemeProvider>
+          <Providers>
+            {children}
+          </Providers>
+        </ThemeProvider>
       </body>
     </html>
   )
