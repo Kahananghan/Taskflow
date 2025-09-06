@@ -120,7 +120,7 @@ export default function Dashboard() {
   const getAISuggestions = async () => {
     setActiveAIFunction('suggestions');
     setAiLoading(true);
-    setAiResponse(''); // Clear previous response
+    setAiResponse(''); 
     try {
       const response = await fetch('/api/ai', {
         method: 'POST',
@@ -128,10 +128,8 @@ export default function Dashboard() {
         body: JSON.stringify({ type: 'suggestions', tasks }),
       });
       const data = await response.json();
-      console.log('AI Suggestions Response:', data); // Debug log
       setAiResponse(data.response || 'No suggestions available');
     } catch (error) {
-      console.error('AI Error:', error);
       setAiResponse('AI suggestions unavailable. Please try again.');
     } finally {
       setAiLoading(false);
@@ -142,7 +140,7 @@ export default function Dashboard() {
     if (!chatMessage.trim()) return;
     setActiveAIFunction('chat');
     setAiLoading(true);
-    setAiResponse(''); // Clear previous response
+    setAiResponse(''); 
     try {
       const response = await fetch('/api/ai', {
         method: 'POST',
@@ -150,7 +148,6 @@ export default function Dashboard() {
         body: JSON.stringify({ type: 'chat', message: chatMessage, tasks }),
       });
       const data = await response.json();
-      console.log('AI Chat Response:', data); // Debug log
       setAiResponse(data.response || 'No response available');
       setChatMessage('');
     } catch (error) {
